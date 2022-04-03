@@ -2,6 +2,7 @@
 // http://localhost:3000/isolated/exercise/07.js
 
 import * as React from 'react'
+import {useEffect} from 'react'
 
 const allItems = [
   {id: 'apple', value: '🍎 apple'},
@@ -11,7 +12,11 @@ const allItems = [
 ]
 
 function App() {
-  const [items, setItems] = React.useState(allItems)
+  const [items, setItems] = React.useState(allItems);
+  useEffect(() => {
+    const id = setInterval(() => shuffle(), 1000)
+    return () => clearInterval(id)
+  }, []);
 
   function addItem() {
     const itemIds = items.map(i => i.id)
@@ -22,6 +27,14 @@ function App() {
     setItems(items.filter(i => i.id !== item.id))
   }
 
+  const shuffle = () => {
+    const sorted = [...items].sort(() => {
+      const randomTrueOrFalse = Math.random() > 0.5;
+      return randomTrueOrFalse ? 1 : -1
+    });
+    setItems(sorted);
+  }
+
   return (
     <div className="keys">
       <button disabled={items.length >= allItems.length} onClick={addItem}>
@@ -29,10 +42,33 @@ function App() {
       </button>
       <ul style={{listStyle: 'none', paddingLeft: 0}}>
         {items.map(item => (
-          // 🐨 add a key prop to the <li> below. Set it to item.id
-          <li>
+          <li key={item.id}>
             <button onClick={() => removeItem(item)}>remove</button>{' '}
             <label htmlFor={`${item.id}-input`}>{item.value}</label>{' '}
+            <input id={`${item.id}-input`} defaultValue={item.value} />
+          </li>
+        ))}
+      </ul>
+      <h2> Without a key</h2>
+      <ul style={{listStyle: 'none', paddingLeft: 0}}>
+        {items.map(item => (
+          <li>
+            <input id={`${item.id}-input`} defaultValue={item.value} />
+          </li>
+        ))}
+      </ul>
+      <h2> Without a index key</h2>
+      <ul style={{listStyle: 'none', paddingLeft: 0}}>
+        {items.map( (item, i) => (
+          <li key={i}>
+            <input id={`${item.id}-input`} defaultValue={item.value} />
+          </li>
+        ))}
+      </ul>
+      <h2> Without a proper key</h2>
+      <ul style={{listStyle: 'none', paddingLeft: 0}}>
+        {items.map(item => (
+          <li key={item.id}>
             <input id={`${item.id}-input`} defaultValue={item.value} />
           </li>
         ))}

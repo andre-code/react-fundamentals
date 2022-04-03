@@ -2,30 +2,52 @@
 // http://localhost:3000/isolated/exercise/06.js
 
 import * as React from 'react'
+import {useRef, useState} from 'react'
 
 function UsernameForm({onSubmitUsername}) {
-  // 🐨 add a submit event handler here (`handleSubmit`).
-  // 💰 Make sure to accept the `event` as an argument and call
-  // `event.preventDefault()` to prevent the default behavior of form submit
-  // events (which refreshes the page).
-  // 📜 https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
-  //
-  // 🐨 get the value from the username input (using whichever method
-  // you prefer from the options mentioned in the instructions)
-  // 💰 For example: event.target.elements[0].value
-  // 🐨 Call `onSubmitUsername` with the value of the input
+  const usernameRef = useRef();  // part extra credit 1
+  const username2Ref = useRef();  // part extra credit 3
+  const [isValid, setIsValid] = useState(null); // part extra credit 1
+  const [username, setUsername] = useState(""); // part extra credit 3
 
-  // 🐨 add the onSubmit handler to the <form> below
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const username = e.target.elements[0].value;
+    onSubmitUsername(username);
+  }
 
-  // 🐨 make sure to associate the label to the input.
-  // to do so, set the value of 'htmlFor' prop of the label to the id of input
+  // extra credits 1
+  const handleSubmitUsingRef = (e) => {
+    e.preventDefault();
+    const username = usernameRef.current.value;
+    onSubmitUsername(username);
+  }
+
+  // extra credits 2
+  const handleOnChange = () => {
+    const username = usernameRef.current.value;
+    setIsValid(username === username.toLowerCase());
+  }
+
+  // extra credits 3
+  const handleOnChange2 = () => {
+    const username = username2Ref.current.value;
+    setUsername(username.toLowerCase())
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div>
         <label>Username:</label>
-        <input type="text" />
+        <input onChange={handleOnChange} ref={usernameRef} type="text" />
+        <div role="alert" style={{ color: "red" }}>{isValid === false ?  "Username must be lower case 🙈" : ""}</div>
       </div>
-      <button type="submit">Submit</button>
+      <div>
+        <label>Username (autofix):</label>
+        <input onChange={handleOnChange2} ref={username2Ref} type="text" value={username} />
+      </div>
+      <button type="submit" disabled={!isValid}>Submit</button>
+      <button onClick={handleSubmitUsingRef} disabled={!isValid}>Using Ref</button>
     </form>
   )
 }
